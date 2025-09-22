@@ -2,6 +2,7 @@ from pandas import read_csv
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.stats import ttest_ind, kruskal
 
 # Dataset
 train_ds = read_csv('Datasets/train.csv', sep=';')
@@ -104,3 +105,15 @@ plt.figure(figsize=(6,4))
 sns.scatterplot(x='age', y='balance', hue='y', data=train_ds, alpha=0.5, palette="Set1")
 plt.title("Edad vs Balance por resultado (y)")
 plt.show()
+
+group_yes = train_ds[train_ds['housing'] == 'yes']['y']
+group_no = train_ds[train_ds['housing'] == 'no']['y']
+
+t_stat, p_val = ttest_ind(group_yes, group_no, equal_var=False)
+print("T-test Housing loan vs No loan")
+print("t = {:.3f}, p = {:.5f}".format(t_stat, p_val))
+
+groups = [group['y'].values for name, group in train_ds.groupby('education')]
+h_stat, p_val = kruskal(*groups)
+print("Kruskal-Wallis Education")
+print("H = {:.3f}, p = {:.5f}".format(h_stat, p_val))
